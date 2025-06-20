@@ -7,7 +7,7 @@ export const Contact = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setSuccess("");
@@ -59,7 +59,9 @@ export const Contact = () => {
                 type="text"
                 id="name"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, name: e.target.value })
+                }
                 placeholder="Your Name"
                 className="input-field bg-white border border-pink-300 p-3 rounded-lg"
                 required
@@ -74,7 +76,9 @@ export const Contact = () => {
                 type="email"
                 id="email"
                 value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setForm({ ...form, email: e.target.value })
+                }
                 placeholder="Your Email"
                 className="input-field bg-white border border-pink-300 p-3 rounded-lg"
                 required
@@ -88,7 +92,9 @@ export const Contact = () => {
               <textarea
                 id="message"
                 value={form.message}
-                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setForm({ ...form, message: e.target.value })
+                }
                 placeholder="Write your message here..."
                 className="input-field bg-white border border-pink-300 p-3 rounded-lg h-32"
                 required
