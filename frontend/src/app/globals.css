@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+    .btn{
+        @apply bg-black text-white px-4 py-2 rounded-lg font-medium inline-flex;
+    }
+    .btn-primary{
+        @apply bg-black text-white;
+    }
+    .btn-text{
+        @apply text-white bg-transparent;
+    }
+    body {
+  background-color: #ffffff; /* or any light color like #ffeef3 for light pink */
+}
+
+    .logo-ticker-image{
+        @apply h-full w-auto;
+    }
+    .tag{
+        @apply text-sm inline-flex border border-[#222]/10 px-3 py-1 rounded-lg tracking-tight;
+    }
+    .section-title {
+        @apply text-center text-3xl md:text-[54px] md:leading-[60px] font-bold tracking-tighter bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 text-transparent bg-clip-text;
+      }
+      
+    .section-description{
+@apply text-center text-3xl text-[22px] leading-[30px]  tracking-tight text-[#010D3E];
+
+    }
+}
