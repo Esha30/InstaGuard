@@ -68,8 +68,10 @@ export const Customer = () => {
       try {
         // Use backticks here for template literal to correctly insert env var
         const res = await fetch(
-          "${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/feedback"
-        );
+
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/public/feedback`
+);
+       
         const data = await res.json();
         if (data?.feedback) {
           const anonymized = data.feedback.map((fb: any) => ({
