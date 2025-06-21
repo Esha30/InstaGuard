@@ -30,7 +30,7 @@ export default function AdminViewProfileResults() {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/admin/profile-results", {
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/profile-results", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

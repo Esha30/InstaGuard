@@ -24,7 +24,7 @@ const ManageUsers = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/get-all-users", {
+      const res = await axios.get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get-all-users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -41,7 +41,7 @@ const ManageUsers = () => {
   const handleDeleteUser = async (userId: string) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/delete-user/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/delete-user/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

@@ -28,7 +28,7 @@ export default function ViewProfiles() {
     }
 
     axios
-      .get("http://localhost:5000/api/admin/users", {
+      .get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

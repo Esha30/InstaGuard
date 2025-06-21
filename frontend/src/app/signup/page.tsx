@@ -76,7 +76,7 @@ const SignupPage = () => {
     const signupData = { ...formData, captcha };
 
     try {
-      const response = await fetch("http://localhost:5000/signup", {
+      const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/signup", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(signupData),
@@ -113,7 +113,7 @@ const SignupPage = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/google-signin", {
+      const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/google-signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

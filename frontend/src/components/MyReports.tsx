@@ -20,7 +20,7 @@ const MyReportsPage = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/my-reports", {
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/my-reports", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

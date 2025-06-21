@@ -47,7 +47,7 @@ const CheckCredentials = () => {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/check-instagram-profile", {
+    const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/check-instagram-profile", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...formData, captcha }),

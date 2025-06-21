@@ -27,7 +27,7 @@ const UserHistoryPage = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/user/history", {
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/user/history", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

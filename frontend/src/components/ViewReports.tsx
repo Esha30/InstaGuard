@@ -28,7 +28,7 @@ export default function ViewReports() {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/admin-reports", {  // Changed here
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/admin-reports", {  // Changed here
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

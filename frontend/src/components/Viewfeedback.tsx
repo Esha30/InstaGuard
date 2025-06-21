@@ -26,7 +26,7 @@ export default function ViewFeedback() {
       return;
     }
 
-    fetch("http://localhost:5000/api/admin/feedback", {
+    fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/feedback", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

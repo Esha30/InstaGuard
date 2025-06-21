@@ -29,7 +29,7 @@ const ReportedProfilesPage = () => {
     const fetchReports = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch("http://localhost:5000/reports", {
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/reports", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -67,7 +67,7 @@ const ReportedProfilesPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/reports", {
+      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

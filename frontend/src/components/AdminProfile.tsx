@@ -40,7 +40,7 @@ const AdminProfile = () => {
           return;
         }
 
-        const response = await axios.get("http://localhost:5000/api/user-info", {
+        const response = await axios.get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-info", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +77,7 @@ const AdminProfile = () => {
       }
 
       const response = await axios.put(
-        "http://localhost:5000/api/update-password",
+        "${process.env.NEXT_PUBLIC_API_BASE_URL}/api/update-password",
         { currentPassword, newPassword },
         {
           headers: {

@@ -32,10 +32,10 @@ const AnalyticsPage = () => {
         const token = localStorage.getItem("token");
 
         const [statsRes, activitiesRes] = await Promise.all([
-          fetch("http://localhost:5000/api/admin/analytics", {
+          fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/analytics", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("http://localhost:5000/api/admin/recent-activities", {
+          fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/recent-activities", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
