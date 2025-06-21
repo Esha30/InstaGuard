@@ -27,7 +27,6 @@ const SignupPage = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [captcha, setCaptcha] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
@@ -76,7 +75,7 @@ const SignupPage = () => {
     const signupData = { ...formData, captcha };
 
     try {
-      const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/signup", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(signupData),
@@ -113,7 +112,7 @@ const SignupPage = () => {
     }
 
     try {
-      const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/google-signin", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/google-signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -144,6 +143,7 @@ const SignupPage = () => {
       setLoading(false);
     }
   };
+
 
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
