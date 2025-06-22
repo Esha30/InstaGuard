@@ -1,19 +1,26 @@
 import os
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from xgboost import XGBClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 import joblib
-import numpy as np
 
-# Ensure the 'model' folder exists
-os.makedirs("model", exist_ok=True)
+# ✅ Get the absolute directory of this script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Load and merge dataset
+# ✅ Set absolute paths for data and model
+DATA_DIR = os.path.join(BASE_DIR, "data")
+MODEL_DIR = os.path.join(BASE_DIR, "model")
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# ✅ Load and merge datasets from absolute paths
+train_path = os.path.join(DATA_DIR, "train.csv")
+test_path = os.path.join(DATA_DIR, "test.csv")
 df = pd.concat([
-    pd.read_csv("data/train.csv"),
-    pd.read_csv("data/test.csv")
+    pd.read_csv(train_path),
+    pd.read_csv(test_path)
 ], ignore_index=True)
 
 # Drop rows where target 'fake' is NaN
@@ -40,16 +47,13 @@ hybrid_model = VotingClassifier(
 hybrid_model.fit(X_train, y_train)
 y_pred = hybrid_model.predict(X_val)
 
-# Remove NaNs from evaluation set just in case
-mask = ~pd.isna(y_val)
-y_val_clean = y_val[mask]
-y_pred_clean = y_pred[mask]
+print("📊 Evaluation Report:")
+print(classification_report(y_val, y_pred))
 
-print(classification_report(y_val_clean, y_pred_clean))
-
-# Train on full data
+# Train on full dataset
 hybrid_model.fit(X, y)
 
-# Save model
-joblib.dump(hybrid_model, "model/final_hybrid_model.pkl")
-print("✅ Hybrid model trained and saved as model/final_hybrid_model.pkl")
+# ✅ Save model using absolute path
+model_path = os.path.join(MODEL_DIR, "final_hybrid_model.pkl")
+joblib.dump(hybrid_model, model_path)
+print(f"✅ Hybrid model trained and saved at {model_path}")

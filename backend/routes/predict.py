@@ -24,14 +24,17 @@ db = client["users"]
 users_collection = db["register"]
 results_collection = db["results"]
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load model using absolute path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(BASE_DIR, "model", "final_hybrid_model.pkl")
 try:
-    model = joblib.load("model/final_hybrid_model.pkl")
+    model = joblib.load(model_path)
 except Exception as e:
     model = None
     logging.error(f"[Model Load Error] {e}")
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 predict_bp = Blueprint("predict", __name__)
 
@@ -198,7 +201,6 @@ def predict(user):
         logger.error(f"[Prediction Error] {e}")
         return jsonify({"error": f"Prediction failed: {str(e)}"}), 500
 
-
 # ------------------------ Admin Profile Results Route ------------------------
 @predict_bp.route('/admin/profile-results', methods=['GET'])
 @cross_origin()
@@ -220,7 +222,7 @@ def admin_profile_results(user):
                 "model_version": doc.get("model_version", MODEL_VERSION),
                 "confidence": doc.get("confidence", 0),
                 "timestamp": doc.get("timestamp").isoformat() if doc.get("timestamp") else None,
-                "note": doc.get("note", None)  # include reason if it exists
+                "note": doc.get("note", None)
             })
 
         return jsonify(output), 200
