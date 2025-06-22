@@ -1,26 +1,31 @@
 "use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import noodleImage from '@/assets/noodle.png';
-import Logo from '@/assets/logosaas.png';
-import { useRouter } from 'next/navigation';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import noodleImage from "@/assets/noodle.png";
+import Logo from "@/assets/logosaas.png";
+import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
+import {
+  GoogleOAuthProvider,
+  GoogleLogin,
+  CredentialResponse,
+} from "@react-oauth/google";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignupPage = () => {
   const router = useRouter();
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, ""); // remove trailing slash
 
   const [formData, setFormData] = useState({
-    fullname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    mobile: '',
+    fullname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    mobile: "",
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -61,7 +66,9 @@ const SignupPage = () => {
 
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,}$/;
     if (!passwordPattern.test(formData.password)) {
-      setErrorMessage("Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.");
+      setErrorMessage(
+        "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character."
+      );
       setLoading(false);
       return;
     }
@@ -72,22 +79,25 @@ const SignupPage = () => {
       return;
     }
 
+    console.log("Captcha token being sent to backend:", captcha);
+
     const signupData = { ...formData, captcha };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch(`${apiBase}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupData),
       });
 
       const result = await response.json();
+
       if (response.ok) {
         setSuccessMessage(result.message || "Signup successful! Redirecting...");
         setTimeout(() => {
           const createdAt = new Date().toISOString();
-          localStorage.setItem('profileCreatedAt', createdAt);
-          router.push('/login');
+          localStorage.setItem("profileCreatedAt", createdAt);
+          router.push("/login");
         }, 2000);
       } else {
         setErrorMessage(result.message || "Signup failed. Please try again.");
@@ -112,7 +122,7 @@ const SignupPage = () => {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/google-signin`, {
+      const response = await fetch(`${apiBase}/google-signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -144,11 +154,10 @@ const SignupPage = () => {
     }
   };
 
-
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
       <>
-        <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
+      <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
           <div className="py-5">
             <div className="container flex items-center space-x-2">
               <Image src={Logo} alt="Logo here" height={40} width={40} />
@@ -300,10 +309,16 @@ const SignupPage = () => {
             </div>
           </div>
           <p className="mt-6 text-white">&copy; InstaGuard, Inc. All rights reserved.</p>
-        </footer>
+        </footer>   
       </>
     </GoogleOAuthProvider>
   );
 };
 
 export default SignupPage;
+
+
+
+
+       
+     
