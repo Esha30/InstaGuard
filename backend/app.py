@@ -118,10 +118,12 @@ def verify_recaptcha(captcha_response):
         payload = {'secret': RECAPTCHA_SECRET_KEY, 'response': captcha_response}
         response = requests.post(verification_url, data=payload)
         result = response.json()
+        logger.info(f"reCAPTCHA response: {result}")  # ✅ log full result
         return result.get('success', False)
     except Exception as e:
         logger.error(f"CAPTCHA verification failed: {e}")
         return False
+
 
 def generate_verification_token():
     return str(uuid.uuid4())
@@ -537,9 +539,21 @@ def add_cors_headers(response):
     if origin in FRONTEND_URLS:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
+
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+
+    # ✅ Add this Content-Security-Policy header to allow Google reCAPTCHA
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "frame-src https://www.google.com https://www.gstatic.com; "
+        "script-src 'self' https://www.google.com https://www.gstatic.com 'unsafe-inline'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "connect-src *;"
+    )
     return response
+
 
 
 # Run the app
