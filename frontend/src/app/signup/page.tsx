@@ -73,8 +73,9 @@ const SignupPage = () => {
     }
 
     // ✅ Prepare only required fields
-    const { fullname, email, password, mobile } = formData;
-    const signupData = { fullname, email, password, mobile, captcha };
+    const { fullname, email, password, confirmPassword, mobile } = formData;
+const signupData = { fullname, email, password, confirmPassword, mobile, captcha };
+
 
     console.log("🚀 Signup Data:", signupData); // ✅ Debug log
 
