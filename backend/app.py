@@ -52,8 +52,9 @@ app = Flask(__name__)
 FRONTEND_URLS = [
     "http://localhost:3000",
     "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app",
-    "https://insta-guard-git-main-eshas-projects-d468d210.vercel.app/"  # ✅ new deployed Vercel frontend
+    "https://insta-guard-git-main-eshas-projects-d468d210.vercel.app"  # ✅ No slash!
 ]
+
 
 CORS(app, resources={r"/*": {
     "origins": FRONTEND_URLS,
@@ -61,6 +62,17 @@ CORS(app, resources={r"/*": {
     "allow_headers": ["Content-Type", "Authorization"],
 }}, supports_credentials=True)
 
+CORS(predict_bp, origins=FRONTEND_URLS)
+CORS(user_profile, origins=FRONTEND_URLS)
+CORS(admin_profile, origins=FRONTEND_URLS)
+CORS(google_signin_bp, origins=FRONTEND_URLS)
+CORS(feedback_bp, origins=FRONTEND_URLS)
+CORS(contact_bp, origins=FRONTEND_URLS)
+CORS(report_bp, origins=FRONTEND_URLS)
+CORS(my_reports_bp, origins=FRONTEND_URLS)
+CORS(admin_reports_bp, origins=FRONTEND_URLS)
+CORS(admin_analytics_bp, origins=FRONTEND_URLS)
+CORS(admin_settings_bp, origins=FRONTEND_URLS)
 
 # === Secret Key for JWT ===
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret_key")  # fallback for dev
