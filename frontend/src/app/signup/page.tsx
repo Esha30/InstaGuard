@@ -18,7 +18,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignupPage = () => {
   const router = useRouter();
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, ""); // remove trailing slash
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, ""); // clean trailing slash
 
   const [formData, setFormData] = useState({
     fullname: "",
@@ -78,8 +78,6 @@ const SignupPage = () => {
       setLoading(false);
       return;
     }
-
-    console.log("Captcha token being sent to backend:", captcha);
 
     const signupData = { ...formData, captcha };
 
@@ -157,7 +155,7 @@ const SignupPage = () => {
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
       <>
-      <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
+        <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
           <div className="py-5">
             <div className="container flex items-center space-x-2">
               <Image src={Logo} alt="Logo here" height={40} width={40} />
@@ -309,7 +307,7 @@ const SignupPage = () => {
             </div>
           </div>
           <p className="mt-6 text-white">&copy; InstaGuard, Inc. All rights reserved.</p>
-        </footer>   
+        </footer>
       </>
     </GoogleOAuthProvider>
   );
@@ -319,6 +317,5 @@ export default SignupPage;
 
 
 
-
-       
      
+    
