@@ -30,9 +30,7 @@ flask-cors
 Flask-JWT-Extended
 fonttools
 frozenlist
-genai
 google-auth
-google-genai
 greenlet
 gunicorn
 h11
