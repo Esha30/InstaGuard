@@ -53,12 +53,14 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
 
 CORS(app, resources={r"/*": {
     "origins": [
-        "http://localhost:3000",            # for local dev
-         FRONTEND_URL # your deployed frontend
+        "http://localhost:3000",
+        FRONTEND_URL,
+        "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app"  # ✅ Add this
     ],
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
 }}, supports_credentials=True)
+
 
 # === Secret Key for JWT ===
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret_key")  # fallback for dev
@@ -516,14 +518,17 @@ app.register_blueprint(admin_settings_bp)
 app.register_blueprint(feedback_bp)
 
 app.register_blueprint(predict_bp)
+
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
-    allowed_origins = ["http://localhost:3000", FRONTEND_URL]
-
+    allowed_origins = [
+        "http://localhost:3000",
+        FRONTEND_URL,
+        "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app"
+    ]
     if origin in allowed_origins:
         response.headers["Access-Control-Allow-Origin"] = origin
-
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Allow-Credentials"] = "true"
@@ -532,6 +537,5 @@ def add_cors_headers(response):
 
 # Run the app
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT", 5000))
     serve(app, host="0.0.0.0", port=port)
