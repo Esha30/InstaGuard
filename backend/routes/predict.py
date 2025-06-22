@@ -13,6 +13,7 @@ import jwt
 import os
 import logging
 from datetime import datetime
+from pathlib import Path
 
 # ---------------------------- Setup ----------------------------
 load_dotenv()
@@ -27,14 +28,17 @@ results_collection = db["results"]
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load model using absolute path
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(BASE_DIR, "model", "final_hybrid_model.pkl")
+# ✅ Load model using robust path handling
+model = None
 try:
-    model = joblib.load(model_path)
+    model_path = Path(__file__).resolve().parent.parent / "model" / "final_hybrid_model.pkl"
+    if model_path.exists():
+        model = joblib.load(model_path)
+        logger.info(f"✅ Model loaded successfully from {model_path}")
+    else:
+        logger.error(f"❌ Model file not found at {model_path}")
 except Exception as e:
-    model = None
-    logging.error(f"[Model Load Error] {e}")
+    logger.error(f"[Model Load Error] {e}")
 
 predict_bp = Blueprint("predict", __name__)
 
@@ -90,11 +94,9 @@ def preprocess_features(features: dict):
             "followees": "#follows"
         })
         df["private"] = 0
-
         for col in expected_columns:
             if col not in df.columns:
                 df[col] = 0
-
         return df[expected_columns]
     except Exception as e:
         logger.error(f"[Preprocessing Error] {e}")
@@ -115,11 +117,9 @@ def predict(user):
         if not username:
             return jsonify({"error": "Username is required"}), 400
 
-        # ✅ Check if it's a known real account with geo restriction
         if username in REAL_BLOCKED_ACCOUNTS:
             restriction_reason = REAL_BLOCKED_ACCOUNTS[username]
             logger.info(f"[Geo-Restricted Account] @{username} marked as real but restricted. Reason: {restriction_reason}")
-
             result_data = {
                 "user_id": str(user["_id"]),
                 "username": username,
@@ -131,7 +131,6 @@ def predict(user):
                 "note": restriction_reason
             }
             results_collection.insert_one(result_data)
-
             return jsonify({
                 "username": username,
                 "prediction": "Real",
@@ -140,7 +139,6 @@ def predict(user):
                 "note": restriction_reason
             }), 200
 
-        # 🧠 Proceed to real-time feature extraction
         features = extract_features(username)
 
         if features == "USER_NOT_FOUND":
@@ -150,16 +148,10 @@ def predict(user):
             }), 404
 
         if not features or not isinstance(features, dict):
-            return jsonify({
-                "error": "Feature extraction failed",
-                "status": "failed"
-            }), 400
+            return jsonify({"error": "Feature extraction failed", "status": "failed"}), 400
 
         if features.get("status") == "failed":
-            return jsonify({
-                "error": features.get("error", "Username does not exist."),
-                "status": "failed"
-            }), 404
+            return jsonify({"error": features.get("error", "Username does not exist."), "status": "failed"}), 404
 
         df = preprocess_features(features)
         if df is None or df.empty:
@@ -187,7 +179,6 @@ def predict(user):
         }
 
         results_collection.insert_one(result_data)
-
         logger.info(f"[Prediction] {username} → {result} ({round(prob, 2) if isinstance(prob, float) else 'N/A'})")
 
         return jsonify({
