@@ -54,7 +54,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
 CORS(app, resources={r"/*": {
     "origins": [
         "http://localhost:3000",            # for local dev
-        "https://insta-guard-eight.vercel.app"  # your deployed frontend
+         FRONTEND_URL # your deployed frontend
     ],
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
@@ -519,7 +519,7 @@ app.register_blueprint(predict_bp)
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
-    allowed_origins = ["http://localhost:3000", "https://insta-guard-eight.vercel.app"]
+    allowed_origins = ["http://localhost:3000", FRONTEND_URL]
 
     if origin in allowed_origins:
         response.headers["Access-Control-Allow-Origin"] = origin
