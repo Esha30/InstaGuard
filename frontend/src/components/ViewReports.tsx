@@ -15,20 +15,27 @@ interface Report {
 export default function ViewReports() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchReports = async () => {
       const token = localStorage.getItem("token");
-      console.log("Token sent to backend:", token);
+      const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+      if (!API_BASE) {
+        setError("API base URL not set. Please check your environment variables.");
+        setLoading(false);
+        return;
+      }
 
       if (!token) {
-        console.error("No auth token found");
+        setError("Authorization token not found. Please log in.");
         setLoading(false);
         return;
       }
 
       try {
-        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/admin-reports", {  // Changed here
+        const res = await fetch(`${API_BASE}/admin-reports`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -36,20 +43,21 @@ export default function ViewReports() {
         });
 
         if (!res.ok) {
-          throw new Error("Failed to fetch reports");
+          throw new Error("Failed to fetch reports.");
         }
 
-        const data: Report[] = await res.json();
+        const data: Omit<Report, "id">[] = await res.json();
 
-        // Add an id field from username + index to use as key (or better if your backend sends _id)
-        const withIds = data.map((r, i) => ({
+        const withIds: Report[] = data.map((r, i) => ({
           ...r,
-          id: r.username + "-" + i,
+          id: `${r.username}-${i}`,
         }));
 
         setReports(withIds);
-      } catch (error) {
-        console.error("Error fetching reports:", error);
+        setError(null);
+      } catch (err: any) {
+        console.error("Error fetching reports:", err.message);
+        setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
       }
@@ -69,11 +77,18 @@ export default function ViewReports() {
           className="text-center mb-12"
         >
           <ClipboardList size={48} className="text-pink-600 mx-auto mb-4" />
-          <h2 className="section-title py-4">User Reports</h2> {/* Optionally change title */}
+          <h2 className="section-title py-4">User Reports</h2>
           <p className="section-description py-2">
             View and manage all reports in the system.
           </p>
         </motion.div>
+
+        {/* Error State */}
+        {error && (
+          <p className="text-center text-red-600 font-medium mb-6">
+            {error}
+          </p>
+        )}
 
         {/* Loading or Report Table */}
         {loading ? (

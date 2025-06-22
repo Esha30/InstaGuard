@@ -19,6 +19,7 @@ export default function ViewFeedback() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     if (!token || typeof token !== "string" || !token.split(".")[1]) {
       setErrorMessage("Invalid or missing token. Please log in as admin.");
@@ -26,7 +27,13 @@ export default function ViewFeedback() {
       return;
     }
 
-    fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/feedback", {
+    if (!API_BASE) {
+      setErrorMessage("API base URL is not defined.");
+      setLoading(false);
+      return;
+    }
+
+    fetch(`${API_BASE}/api/admin/feedback`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -34,14 +41,16 @@ export default function ViewFeedback() {
       },
     })
       .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+
         if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
           if (res.status === 401 || res.status === 403) {
             throw new Error(data.message || "Unauthorized. Admin access required.");
           }
           throw new Error(data.error || "Failed to fetch feedback.");
         }
-        return res.json();
+
+        return data;
       })
       .then((data) => {
         setFeedbackList(data.feedback || []);

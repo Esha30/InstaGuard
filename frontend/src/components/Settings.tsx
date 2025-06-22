@@ -14,25 +14,34 @@ export default function AdminSettings() {
 
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   useEffect(() => {
     const fetchSettings = async () => {
       const token = localStorage.getItem("token");
+      if (!token || !API_BASE) return;
+
       try {
-        const res = await fetch("http://localhost:5000/api/admin/settings", {
+        const res = await fetch(`${API_BASE}/api/admin/settings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const data = await res.json();
-        if (res.ok) setSettings(data);
-        else showMessage("error", "Failed to fetch settings: " + (data.error || "Unknown error"));
+
+        if (res.ok) {
+          setSettings(data);
+        } else {
+          showMessage("error", "Failed to fetch settings: " + (data.error || "Unknown error"));
+        }
       } catch (error) {
-        showMessage("error", "Error fetching settings: " + error);
+        showMessage("error", "Error fetching settings: " + (error as Error).message);
       }
     };
 
     fetchSettings();
-  }, []);
+  }, [API_BASE]);
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
@@ -49,10 +58,14 @@ export default function AdminSettings() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token || !API_BASE) {
+      showMessage("error", "Missing API URL or auth token.");
+      return;
+    }
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/settings", {
+      const response = await fetch(`${API_BASE}/api/admin/settings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,9 +130,7 @@ export default function AdminSettings() {
         >
           {/* Site Name */}
           <div className="space-y-1">
-            <label className="block text-sm font-semibold text-gray-800">
-              Site Name
-            </label>
+            <label className="block text-sm font-semibold text-gray-800">Site Name</label>
             <input
               type="text"
               name="siteName"
@@ -131,9 +142,7 @@ export default function AdminSettings() {
 
           {/* Support Email */}
           <div className="space-y-1">
-            <label className="block text-sm font-semibold text-gray-800">
-              Support Email
-            </label>
+            <label className="block text-sm font-semibold text-gray-800">Support Email</label>
             <input
               type="email"
               name="supportEmail"

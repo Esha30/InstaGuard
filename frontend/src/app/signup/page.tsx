@@ -116,7 +116,7 @@ const SignupPage = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ id_token: res.credential }),
+        body: JSON.stringify({ id_token: res.credential, captcha }),
       });
 
       const payload = await response.json();
@@ -144,9 +144,9 @@ const SignupPage = () => {
     }
   };
 
-
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
+
       <>
         <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
           <div className="py-5">

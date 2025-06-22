@@ -21,25 +21,35 @@ export default function ViewProfiles() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    if (!token) {
-      console.error("Authorization token is missing!");
+    if (!token || typeof token !== "string") {
+      setError("Authorization token is missing. Please log in.");
+      setLoading(false);
+      return;
+    }
+
+    if (!API_BASE) {
+      setError("API base URL not configured.");
+      setLoading(false);
       return;
     }
 
     axios
-      .get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users", {
+      .get(`${API_BASE}/api/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
         setProfiles(res.data.users || []);
-        setLoading(false);
+        setError(null);
       })
       .catch((err) => {
         console.error("Failed to fetch user profiles", err);
-        setError("Failed to fetch user profiles!");
+        setError("Failed to fetch user profiles.");
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
@@ -71,9 +81,9 @@ export default function ViewProfiles() {
         {/* Table or Loading State */}
         {loading ? (
           <p className="text-gray-500 text-center">Loading profiles...</p>
-        ) : profiles.length === 0 ? (
+        ) : !error && profiles.length === 0 ? (
           <p className="text-gray-500 text-center">No user profiles found.</p>
-        ) : (
+        ) : !error && (
           <div className="overflow-x-auto rounded-2xl shadow border border-pink-200 mt-6">
             <table className="min-w-full bg-white">
               <thead className="bg-pink-100 text-purple-700 text-left text-sm font-semibold">
@@ -101,7 +111,9 @@ export default function ViewProfiles() {
                     <td className="p-3">
                       <span
                         className={
-                          user.isVerified ? "text-green-600 font-medium" : "text-red-500 font-medium"
+                          user.isVerified
+                            ? "text-green-600 font-medium"
+                            : "text-red-500 font-medium"
                         }
                       >
                         {user.isVerified ? "Verified ✅" : "Not Verified ❌"}

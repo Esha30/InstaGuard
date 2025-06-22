@@ -34,7 +34,7 @@ export default function CheckUsername() {
     setErrorMessage("");
 
     try {
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/predict", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,6 @@ export default function CheckUsername() {
   return (
     <div className="bg-gradient-to-b from-white to-[#ffeef3] py-16 min-h-screen relative overflow-hidden">
       <div className="max-w-4xl mx-auto px-6">
-
         {/* Decorative Images */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}

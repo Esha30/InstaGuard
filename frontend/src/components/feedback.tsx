@@ -33,7 +33,7 @@ export default function FeedbackPage() {
     }
 
     try {
-      const res = await fetch('${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/feedback`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

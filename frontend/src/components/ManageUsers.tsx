@@ -24,15 +24,16 @@ const ManageUsers = () => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get-all-users", {
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/get-all-users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       console.log("Fetched users:", res.data.users);
       setUsers(res.data.users || []);
     } catch (err) {
-      setError("Failed to fetch users");
+      setError("Failed to fetch users.");
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,7 @@ const ManageUsers = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -56,7 +57,6 @@ const ManageUsers = () => {
       console.log('User deleted successfully');
       setUsers(prevUsers => prevUsers.filter(user => user._id !== userId));
       setMessage("User deleted successfully!");
-
       setTimeout(() => setMessage(null), 5000);
     } catch (error) {
       console.error('Error deleting user:', error);

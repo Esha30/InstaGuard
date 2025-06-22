@@ -30,12 +30,15 @@ export default function AdminViewProfileResults() {
       }
 
       try {
-        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/profile-results", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/profile-results`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (!res.ok) {
           throw new Error("Failed to fetch profile results");
@@ -63,10 +66,8 @@ export default function AdminViewProfileResults() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <ShieldCheck size={48} className="text-pink-600 mx-auto mb-4"  />
-          <h2 className="section-title py-4">
-            Profile Analysis Results
-          </h2>
+          <ShieldCheck size={48} className="text-pink-600 mx-auto mb-4" />
+          <h2 className="section-title py-4">Profile Analysis Results</h2>
           <p className="section-description py-2">
             AI predictions of reported or checked Instagram profiles.
           </p>
@@ -115,7 +116,9 @@ export default function AdminViewProfileResults() {
                         {result.prediction}
                       </span>
                     </td>
-                    <td className="py-3 px-4">{(result.confidence * 100).toFixed(2)}%</td>
+                    <td className="py-3 px-4">
+                      {(result.confidence * 100).toFixed(2)}%
+                    </td>
                     <td className="py-3 px-4">{result.model_version}</td>
                     <td className="py-3 px-4">
                       {new Date(result.timestamp).toLocaleString()}

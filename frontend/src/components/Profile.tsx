@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -26,6 +27,8 @@ const ProfilePage = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
@@ -35,7 +38,7 @@ const ProfilePage = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/user/profile", {
+        const res = await fetch(`${API_BASE}/user/profile`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -66,7 +69,7 @@ const ProfilePage = () => {
     };
 
     fetchProfile();
-  }, [router]);
+  }, [router, API_BASE]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -92,7 +95,7 @@ const ProfilePage = () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Missing token");
 
-      const res = await fetch("http://localhost:5000/user/profile", {
+      const res = await fetch(`${API_BASE}/user/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +113,6 @@ const ProfilePage = () => {
       if (res.ok) {
         const now = new Date().toISOString();
         setSuccess("Profile updated successfully.");
-        setError(null);
         setProfileData({
           ...profileData,
           password: "",
@@ -265,7 +267,7 @@ const ProfilePage = () => {
           <div className="flex justify-center">
             <ReCAPTCHA
               sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-              onChange={setCaptcha}
+              onChange={(value) => setCaptcha(value)}
             />
           </div>
 

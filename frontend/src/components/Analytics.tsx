@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -32,10 +33,10 @@ const AnalyticsPage = () => {
         const token = localStorage.getItem("token");
 
         const [statsRes, activitiesRes] = await Promise.all([
-          fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/analytics", {
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/analytics`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/recent-activities", {
+          fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/recent-activities`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -170,7 +171,9 @@ const AnalyticsPage = () => {
                 activities.map((activity, index) => (
                   <li key={index} className="flex items-center justify-between">
                     <p className="text-gray-600">{activity.description}</p>
-                    <span className="text-sm text-gray-500">{activity.timestamp}</span>
+                    <span className="text-sm text-gray-500">
+                      {new Date(activity.timestamp).toLocaleString()}
+                    </span>
                   </li>
                 ))
               )}

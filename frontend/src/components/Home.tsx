@@ -33,7 +33,7 @@ const Home = () => {
     }
 
     try {
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-info", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-info`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const Home = () => {
 
       <p className="section-description py-2">Your personalized dashboard overview</p>
 
-      {/* Cog Image */}
+      {/* Tube Image */}
       <motion.div
         className="absolute bottom-4 left-4 hidden md:block"
         initial={{ rotate: 0, opacity: 0.5 }}

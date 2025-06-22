@@ -25,30 +25,38 @@ const ReportedProfilesPage = () => {
     status: "Pending",
   });
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   useEffect(() => {
     const fetchReports = async () => {
       const token = localStorage.getItem("token");
+      if (!token || !API_BASE) return;
+
       try {
-        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/reports", {
+        const res = await fetch(`${API_BASE}/reports`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         const data = await res.json();
+
         if (res.ok) {
           setReports(data);
         } else {
           console.error("Failed to fetch reports:", data.error);
+          setErrorMsg("Failed to load reports.");
         }
       } catch (err) {
         console.error("Error fetching reports:", err);
+        setErrorMsg("Error loading reported profiles.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchReports();
-  }, []);
+  }, [API_BASE]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -67,7 +75,9 @@ const ReportedProfilesPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/reports", {
+      if (!token || !API_BASE) throw new Error("Missing token or API base URL");
+
+      const res = await fetch(`${API_BASE}/reports`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,12 +97,12 @@ const ReportedProfilesPage = () => {
         ]);
         setTimeout(() => setSuccessMsg(""), 3000);
       } else {
-        setErrorMsg(`❌ Error: ${result.error}`);
+        setErrorMsg(`❌ Error: ${result.error || "Submission failed"}`);
         setTimeout(() => setErrorMsg(""), 3000);
       }
     } catch (err) {
+      console.error("Submission error:", err);
       setErrorMsg("❌ An error occurred while submitting the report.");
-      console.error(err);
       setTimeout(() => setErrorMsg(""), 3000);
     }
   };
@@ -100,8 +110,6 @@ const ReportedProfilesPage = () => {
   return (
     <div className="bg-gradient-to-b from-white to-[#ffeef3] py-24 min-h-screen relative overflow-hidden">
       <div className="container max-w-3xl mx-auto px-4 relative">
-       
-
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

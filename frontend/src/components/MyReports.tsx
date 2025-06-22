@@ -5,8 +5,15 @@ import { motion } from "framer-motion";
 import { FaUserCircle } from "react-icons/fa";
 import { MdOutlineFeedback } from "react-icons/md";
 
+interface Report {
+  username: string;
+  dateReported: string;
+  reason: string;
+  status: string;
+}
+
 const MyReportsPage = () => {
-  const [myReports, setMyReports] = useState<any[]>([]);
+  const [myReports, setMyReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +27,7 @@ const MyReportsPage = () => {
       }
 
       try {
-        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE_URL}/my-reports", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/my-reports`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

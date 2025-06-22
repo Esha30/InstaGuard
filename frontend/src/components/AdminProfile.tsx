@@ -24,7 +24,7 @@ const AdminProfile = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
-  const [updateLoading, setUpdateLoading] = useState(false); // loading for password update
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -40,11 +40,14 @@ const AdminProfile = () => {
           return;
         }
 
-        const response = await axios.get("${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-info", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user-info`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setUser(response.data);
         setLoading(false);
@@ -77,7 +80,7 @@ const AdminProfile = () => {
       }
 
       const response = await axios.put(
-        "${process.env.NEXT_PUBLIC_API_BASE_URL}/api/update-password",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/update-password`,
         { currentPassword, newPassword },
         {
           headers: {
@@ -86,13 +89,13 @@ const AdminProfile = () => {
         }
       );
 
-      if (response.data.success) {
+      if (response.data?.success) {
         setPasswordSuccess("Password updated successfully");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmNewPassword("");
       } else {
-        setPasswordError(response.data.message || "Error updating password.");
+        setPasswordError(response.data?.message || "Error updating password.");
       }
     } catch (error) {
       setPasswordError("Error updating password. Please try again.");
@@ -105,6 +108,7 @@ const AdminProfile = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
+   
     <div className="p-6 relative">
       <motion.h1 className="section-title" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
         Welcome back, {user?.fullname || "User"} 👋
