@@ -76,7 +76,8 @@ const SignupPage = () => {
     const signupData = { ...formData, captcha };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
+       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
+
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupData),
@@ -270,11 +271,15 @@ const SignupPage = () => {
       </div>
 
       <div className="mt-2">
-        <ReCAPTCHA
-          ref={recaptchaRef}
-          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-          onChange={(token) => setCaptcha(token)}
-        />
+       <ReCAPTCHA
+  ref={recaptchaRef}
+  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+  onChange={(token) => {
+    console.log("reCAPTCHA token:", token); // 🔍 Add this log
+    setCaptcha(token);
+  }}
+/>
+
       </div>
 
       <button
