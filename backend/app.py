@@ -52,7 +52,7 @@ app = Flask(__name__)
 FRONTEND_URLS = [
     "http://localhost:3000",
     "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app",
-    "https://insta-guard-2824r196z-eshas-projects-d468d210.vercel.app"  # ✅ new deployed Vercel frontend
+    "https://insta-guard-git-main-eshas-projects-d468d210.vercel.app/"  # ✅ new deployed Vercel frontend
 ]
 
 CORS(app, resources={r"/*": {
