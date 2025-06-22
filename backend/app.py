@@ -49,16 +49,16 @@ app = Flask(__name__)
 # Update the CORS setup in your Flask app
 
 # Set up CORS for live frontend and local dev
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+FRONTEND_URLS = [
+    "http://localhost:3000",
+    "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app",
+    "https://insta-guard-2824r196z-eshas-projects-d468d210.vercel.app"  # ✅ new deployed Vercel frontend
+]
 
 CORS(app, resources={r"/*": {
-    "origins": [
-        "http://localhost:3000",
-        FRONTEND_URL,
-        "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app"  # ✅ Add this
-    ],
+    "origins": FRONTEND_URLS,
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization"]
+    "allow_headers": ["Content-Type", "Authorization"],
 }}, supports_credentials=True)
 
 
@@ -522,16 +522,11 @@ app.register_blueprint(predict_bp)
 @app.after_request
 def add_cors_headers(response):
     origin = request.headers.get("Origin")
-    allowed_origins = [
-        "http://localhost:3000",
-        FRONTEND_URL,
-        "https://insta-guard-6c956n5k6-eshas-projects-d468d210.vercel.app"
-    ]
-    if origin in allowed_origins:
+    if origin in FRONTEND_URLS:
         response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
 
