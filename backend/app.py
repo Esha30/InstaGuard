@@ -352,6 +352,9 @@ def protected_route(current_user):
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
     
+@app.route('/api/status', methods=['GET'])
+def status():
+    return jsonify({"status": "Backend is running ✅"}), 200
 
     
 @app.route('/api/get-all-users', methods=['GET'])
