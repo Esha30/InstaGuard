@@ -3,7 +3,6 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import noodleImage from "@/assets/noodle.png";
 import Logo from "@/assets/logosaas.png";
 import { useRouter } from "next/navigation";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -73,77 +72,72 @@ const SignupPage = () => {
       return;
     }
 
-    const signupData = { ...formData, captcha };
+    // ✅ Prepare only required fields
+    const { fullname, email, password, mobile } = formData;
+    const signupData = { fullname, email, password, mobile, captcha };
+
+    console.log("🚀 Signup Data:", signupData); // ✅ Debug log
 
     try {
-       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
-
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupData),
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (jsonErr) {
+        throw new Error("Invalid JSON response from server");
+      }
+
       if (response.ok) {
         setSuccessMessage(result.message || "Signup successful! Redirecting...");
         setTimeout(() => {
-          const createdAt = new Date().toISOString();
-          localStorage.setItem("profileCreatedAt", createdAt);
+          localStorage.setItem("profileCreatedAt", new Date().toISOString());
           router.push("/login");
         }, 2000);
       } else {
         setErrorMessage(result.message || "Signup failed. Please try again.");
-        recaptchaRef.current?.reset(); // 🔁 reset reCAPTCHA
+        recaptchaRef.current?.reset();
         setCaptcha(null);
       }
     } catch (error) {
-      console.error("Error during signup:", error);
-      setErrorMessage("Something went wrong. Please try again later.");
+      console.error("❌ Signup error:", error);
+      setErrorMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async (res: CredentialResponse) => {
-    setErrorMessage(null);
-    setSuccessMessage(null);
-    setLoading(true);
-
     if (!res.credential) {
       setErrorMessage("No credential returned from Google");
-      setLoading(false);
       return;
     }
 
+    setLoading(true);
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/google-signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ id_token: res.credential, captcha }),
       });
 
       const payload = await response.json();
 
       if (response.ok) {
-        const accessToken = payload.access_token;
-
-        if (accessToken) {
-          localStorage.setItem("token", accessToken);
-          setSuccessMessage(payload.message || "Google Sign-in successful!");
-          setTimeout(() => {
-            router.push("/user-dashboard");
-          }, 1500);
-        } else {
-          setErrorMessage("Access token not found in server response.");
-        }
+        localStorage.setItem("token", payload.access_token);
+        setSuccessMessage("Google Sign-in successful!");
+        setTimeout(() => router.push("/user-dashboard"), 1500);
       } else {
         setErrorMessage(payload.message || "Google sign-in failed");
-        recaptchaRef.current?.reset(); // 🔁 reset reCAPTCHA
+        recaptchaRef.current?.reset();
         setCaptcha(null);
       }
     } catch (err) {
-      console.error("Error calling Google-signin:", err);
+      console.error("❌ Google sign-in error:", err);
       setErrorMessage("Server error during Google sign-in");
     } finally {
       setLoading(false);
@@ -152,7 +146,7 @@ const SignupPage = () => {
 
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
-      
+
       <>
         <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
           <div className="py-5">
@@ -271,15 +265,7 @@ const SignupPage = () => {
       </div>
 
       <div className="mt-2">
-       <ReCAPTCHA
-  ref={recaptchaRef}
-  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-  onChange={(token) => {
-    console.log("reCAPTCHA token:", token); // 🔍 Add this log
-    setCaptcha(token);
-  }}
-/>
-
+        <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} onChange={setCaptcha} />
       </div>
 
       <button
