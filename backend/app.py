@@ -36,6 +36,8 @@ from routes.my_reports import my_reports_bp
 from routes.admin_reports import admin_reports_bp
 from routes.admin_settings import admin_settings_bp
 from routes.feedback import feedback_bp
+from waitress import serve
+
 # === Setup Logging ===
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -512,5 +514,7 @@ def add_cors_headers(response):
     return response
 
 # Run the app
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+
+    port = int(os.environ.get("PORT", 5000))
+    serve(app, host="0.0.0.0", port=port)
