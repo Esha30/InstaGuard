@@ -48,15 +48,17 @@ load_dotenv()
 app = Flask(__name__)
 # Update the CORS setup in your Flask app
 
-
+# Set up CORS for live frontend and local dev
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
 
-# Set up CORS for live frontend and local dev
 CORS(app, resources={r"/*": {
-    "origins": [FRONTEND_URL, "http://localhost:3000"],
-    "methods": ["GET", "POST", "DELETE", "PUT"]
-}}, supports_credentials=True,
-   allow_headers=["Content-Type", "Authorization"])
+    "origins": [
+        "http://localhost:3000",            # for local dev
+        "https://insta-guard-eight.vercel.app"  # your deployed frontend
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"]
+}}, supports_credentials=True)
 
 # === Secret Key for JWT ===
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret_key")  # fallback for dev
