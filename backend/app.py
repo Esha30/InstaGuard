@@ -49,8 +49,14 @@ app = Flask(__name__)
 # Update the CORS setup in your Flask app
 
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "methods": ["GET", "POST", "DELETE", "PUT"]}},
-     supports_credentials=True, allow_headers=["Content-Type", "Authorization"])
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+
+# Set up CORS for live frontend and local dev
+CORS(app, resources={r"/*": {
+    "origins": [FRONTEND_URL, "http://localhost:3000"],
+    "methods": ["GET", "POST", "DELETE", "PUT"]
+}}, supports_credentials=True,
+   allow_headers=["Content-Type", "Authorization"])
 
 # === Secret Key for JWT ===
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "dev_secret_key")  # fallback for dev
