@@ -1,26 +1,27 @@
 "use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import noodleImage from '@/assets/noodle.png';
-import Logo from '@/assets/logosaas.png';
-import { useRouter } from 'next/navigation';
-import ReCAPTCHA from 'react-google-recaptcha';
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import noodleImage from "@/assets/noodle.png";
+import Logo from "@/assets/logosaas.png";
+import { useRouter } from "next/navigation";
+import ReCAPTCHA from "react-google-recaptcha";
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const SignupPage = () => {
   const router = useRouter();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const [formData, setFormData] = useState({
-    fullname: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    mobile: '',
+    fullname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    mobile: "",
   });
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -76,8 +77,8 @@ const SignupPage = () => {
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(signupData),
       });
 
@@ -86,11 +87,13 @@ const SignupPage = () => {
         setSuccessMessage(result.message || "Signup successful! Redirecting...");
         setTimeout(() => {
           const createdAt = new Date().toISOString();
-          localStorage.setItem('profileCreatedAt', createdAt);
-          router.push('/login');
+          localStorage.setItem("profileCreatedAt", createdAt);
+          router.push("/login");
         }, 2000);
       } else {
         setErrorMessage(result.message || "Signup failed. Please try again.");
+        recaptchaRef.current?.reset(); // 🔁 reset reCAPTCHA
+        setCaptcha(null);
       }
     } catch (error) {
       console.error("Error during signup:", error);
@@ -135,6 +138,8 @@ const SignupPage = () => {
         }
       } else {
         setErrorMessage(payload.message || "Google sign-in failed");
+        recaptchaRef.current?.reset(); // 🔁 reset reCAPTCHA
+        setCaptcha(null);
       }
     } catch (err) {
       console.error("Error calling Google-signin:", err);
@@ -146,7 +151,7 @@ const SignupPage = () => {
 
   return (
     <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID!}>
-
+      
       <>
         <header className="sticky top-0 z-30 w-full backdrop-blur-md bg-white/70 shadow-sm transition-all duration-300">
           <div className="py-5">
@@ -265,7 +270,11 @@ const SignupPage = () => {
       </div>
 
       <div className="mt-2">
-        <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!} onChange={setCaptcha} />
+        <ReCAPTCHA
+          ref={recaptchaRef}
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+          onChange={(token) => setCaptcha(token)}
+        />
       </div>
 
       <button
