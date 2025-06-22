@@ -113,17 +113,17 @@ def verify_jwt(token):
         return None
 
 def verify_recaptcha(captcha_response):
-    try:
-        verification_url = 'https://www.google.com/recaptcha/api/siteverify'
-        payload = {'secret': RECAPTCHA_SECRET_KEY, 'response': captcha_response}
-        response = requests.post(verification_url, data=payload)
-        result = response.json()
-        logger.info(f"reCAPTCHA response: {result}")  # ✅ log full result
-        return result.get('success', False)
-    except Exception as e:
-        logger.error(f"CAPTCHA verification failed: {e}")
-        return False
-
+    payload = {
+        'secret': RECAPTCHA_SECRET_KEY,
+        'response': captcha_response
+    }
+    res = requests.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        data=payload
+    )
+    result = res.json()
+    logger.info(f"[reCAPTCHA] result: {result}")
+    return result.get('success', False)
 
 def generate_verification_token():
     return str(uuid.uuid4())
