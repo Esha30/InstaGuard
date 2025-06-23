@@ -27,6 +27,7 @@ def login_instaloader():
         os.getenv("IG_USERNAME4"),
     ]
 
+    # Load from correct session directory
     session_dir = os.path.join(os.path.dirname(__file__), "sessions")
     os.makedirs(session_dir, exist_ok=True)
 
@@ -34,7 +35,9 @@ def login_instaloader():
         if not username:
             continue
 
-        session_path = os.path.join(session_dir, f"{username}.session")
+        # Correct: Look for session-*username* instead of *username*.session
+        session_path = os.path.join(session_dir, f"session-{username}")
+
         L = instaloader.Instaloader()
 
         try:
@@ -51,6 +54,7 @@ def login_instaloader():
 
     print("[Login Error] All session attempts failed.")
     return None
+
 
 def get_instaloader_data(username):
     L = login_instaloader()
