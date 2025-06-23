@@ -10,7 +10,7 @@ import requests
 import time
 import os
 from requests_html import HTMLSession
-from instaloader.exceptions import ProfileNotExistsException
+from instaloader.exceptions import ProfileNotExistsException, BadResponseException
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,28 +20,41 @@ def count_numbers_ratio(text):
     return round(numbers / len(text), 2) if len(text) > 0 else 0
 
 def login_instaloader():
-    L = instaloader.Instaloader()
     accounts = [
         (os.getenv("IG_USERNAME1"), os.getenv("IG_PASSWORD1")),
         (os.getenv("IG_USERNAME2"), os.getenv("IG_PASSWORD2")),
         (os.getenv("IG_USERNAME3"), os.getenv("IG_PASSWORD3")),
         (os.getenv("IG_USERNAME4"), os.getenv("IG_PASSWORD4")),
     ]
+
     for username, password in accounts:
         if not username or not password:
             continue
-        session_file = username
+
+        session_dir = "sessions"
+        session_file = os.path.join(session_dir, f"{username}.session")
+        os.makedirs(session_dir, exist_ok=True)
+
+        L = instaloader.Instaloader()
+
         try:
-            print(f"[Login Attempt] Trying with account: {username}")
-            if os.path.exists(f"{session_file}.session"):
-                L.load_session_from_file(session_file)
+            if os.path.exists(session_file):
+                print(f"[Session] Trying saved session for {username}")
+                L.load_session_from_file(username, filename=session_file)
+                instaloader.Profile.from_username(L.context, username)  # Validate session
+                print(f"[Login Success] Session valid for {username}")
+                return L
             else:
+                print(f"[Login Attempt] Logging in with {username}")
                 L.login(username, password)
-                L.save_session_to_file(session_file)
-            print(f"[Login Success] Logged in with: {username}")
-            return L
+                L.save_session_to_file(filename=session_file)
+                print(f"[Login Success] Logged in and saved session for {username}")
+                return L
+        except (ProfileNotExistsException, BadResponseException) as e:
+            print(f"[Login Failed] {username}: {e}")
         except Exception as e:
             print(f"[Login Failed] {username}: {e}")
+
     print("[Login Error] All accounts failed")
     return None
 
