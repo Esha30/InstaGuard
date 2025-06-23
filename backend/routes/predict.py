@@ -6,7 +6,6 @@ from bson.errors import InvalidId
 from flask_cors import cross_origin
 from dotenv import load_dotenv
 from routes.extract_features import extract_features
-from routes.real_accounts import REAL_BLOCKED_ACCOUNTS
 import pandas as pd
 import joblib
 import jwt
@@ -17,6 +16,9 @@ from pathlib import Path
 
 # ---------------------------- Setup ----------------------------
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 MODEL_VERSION = os.getenv("MODEL_VERSION", "v1.0")
 
@@ -25,18 +27,15 @@ db = client["users"]
 users_collection = db["register"]
 results_collection = db["results"]
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# ✅ Load model using robust path handling
+# ✅ Robust path loading for model
 model = None
 try:
     model_path = Path(__file__).resolve().parent.parent / "model" / "final_hybrid_model.pkl"
     if model_path.exists():
         model = joblib.load(model_path)
-        logger.info(f"✅ Model loaded successfully from {model_path}")
+        logger.info(f"✅ Model loaded from {model_path}")
     else:
-        logger.error(f"❌ Model file not found at {model_path}")
+        logger.error(f"❌ Model not found at {model_path}")
 except Exception as e:
     logger.error(f"[Model Load Error] {e}")
 
@@ -93,7 +92,7 @@ def preprocess_features(features: dict):
             "followers": "#followers",
             "followees": "#follows"
         })
-        df["private"] = 0
+        df["private"] = 0  # Assume public
         for col in expected_columns:
             if col not in df.columns:
                 df[col] = 0
@@ -117,28 +116,6 @@ def predict(user):
         if not username:
             return jsonify({"error": "Username is required"}), 400
 
-        if username in REAL_BLOCKED_ACCOUNTS:
-            restriction_reason = REAL_BLOCKED_ACCOUNTS[username]
-            logger.info(f"[Geo-Restricted Account] @{username} marked as real but restricted. Reason: {restriction_reason}")
-            result_data = {
-                "user_id": str(user["_id"]),
-                "username": username,
-                "features": {},
-                "prediction": "Real",
-                "model_version": MODEL_VERSION,
-                "confidence": 1.0,
-                "timestamp": datetime.utcnow(),
-                "note": restriction_reason
-            }
-            results_collection.insert_one(result_data)
-            return jsonify({
-                "username": username,
-                "prediction": "Real",
-                "confidence": 1.0,
-                "message": "This is a verified real account restricted for extraction.",
-                "note": restriction_reason
-            }), 200
-
         features = extract_features(username)
 
         if features == "USER_NOT_FOUND":
@@ -148,10 +125,16 @@ def predict(user):
             }), 404
 
         if not features or not isinstance(features, dict):
-            return jsonify({"error": "Feature extraction failed", "status": "failed"}), 400
+            return jsonify({
+                "error": "Feature extraction failed",
+                "status": "failed"
+            }), 400
 
         if features.get("status") == "failed":
-            return jsonify({"error": features.get("error", "Username does not exist."), "status": "failed"}), 404
+            return jsonify({
+                "error": features.get("error", "Username does not exist."),
+                "status": "failed"
+            }), 404
 
         df = preprocess_features(features)
         if df is None or df.empty:
@@ -179,6 +162,7 @@ def predict(user):
         }
 
         results_collection.insert_one(result_data)
+
         logger.info(f"[Prediction] {username} → {result} ({round(prob, 2) if isinstance(prob, float) else 'N/A'})")
 
         return jsonify({
@@ -212,8 +196,7 @@ def admin_profile_results(user):
                 "prediction": doc.get("prediction", ""),
                 "model_version": doc.get("model_version", MODEL_VERSION),
                 "confidence": doc.get("confidence", 0),
-                "timestamp": doc.get("timestamp").isoformat() if doc.get("timestamp") else None,
-                "note": doc.get("note", None)
+                "timestamp": doc.get("timestamp").isoformat() if doc.get("timestamp") else None
             })
 
         return jsonify(output), 200
