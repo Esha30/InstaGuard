@@ -41,7 +41,7 @@ def login_instaloader():
             if os.path.exists(session_file):
                 print(f"[Session] Trying saved session for {username}")
                 L.load_session_from_file(username, filename=session_file)
-                instaloader.Profile.from_username(L.context, username)  # Validate session
+                instaloader.Profile.from_username(L.context, username)
                 print(f"[Login Success] Session valid for {username}")
                 return L
             else:
@@ -188,7 +188,6 @@ def extract_features(username):
         print("[Instaloader] Success:", data)
         return data
 
-    # If instaloader failed, use fallback scrapers
     print("[Fallback] Instaloader failed. Trying alternate methods...")
 
     fallback_methods = [
