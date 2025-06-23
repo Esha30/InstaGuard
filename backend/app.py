@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime, timedelta
 import logging
 import jwt
+from flask import send_file
 from joblib import load
 import traceback  # Add this at the top
 from bson import ObjectId
@@ -37,6 +38,7 @@ from routes.admin_reports import admin_reports_bp
 from routes.admin_settings import admin_settings_bp
 from routes.feedback import feedback_bp
 from waitress import serve
+from pathlib import Path
 
 # === Setup Logging ===
 logging.basicConfig(level=logging.INFO)
@@ -184,6 +186,17 @@ def send_verification_email(to_email, token):
         logger.error(f"Failed to send verification email: {str(e)}")
 
 # === Routes ===
+
+@app.route('/check-model', methods=['GET'])
+def check_model():
+    model_path = Path(__file__).resolve().parent / "model" / "final_hybrid_model.pkl"
+    scaler_path = Path(__file__).resolve().parent / "model" / "scaler.pkl"
+    return jsonify({
+        "model_exists": model_path.exists(),
+        "scaler_exists": scaler_path.exists(),
+        "model_path": str(model_path),
+        "scaler_path": str(scaler_path)
+    })
 
 @app.route('/signup', methods=['POST'])
 def signup():
