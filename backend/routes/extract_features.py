@@ -21,41 +21,35 @@ def count_numbers_ratio(text):
 
 def login_instaloader():
     accounts = [
-        (os.getenv("IG_USERNAME1"), os.getenv("IG_PASSWORD1")),
-        (os.getenv("IG_USERNAME2"), os.getenv("IG_PASSWORD2")),
-        (os.getenv("IG_USERNAME3"), os.getenv("IG_PASSWORD3")),
-        (os.getenv("IG_USERNAME4"), os.getenv("IG_PASSWORD4")),
+        os.getenv("IG_USERNAME1"),
+        os.getenv("IG_USERNAME2"),
+        os.getenv("IG_USERNAME3"),
+        os.getenv("IG_USERNAME4"),
     ]
 
-    for username, password in accounts:
-        if not username or not password:
+    session_dir = os.path.join(os.path.dirname(__file__), "sessions")
+    os.makedirs(session_dir, exist_ok=True)
+
+    for username in accounts:
+        if not username:
             continue
 
-        session_dir = "sessions"
-        session_file = os.path.join(session_dir, f"{username}.session")
-        os.makedirs(session_dir, exist_ok=True)
-
+        session_path = os.path.join(session_dir, f"{username}.session")
         L = instaloader.Instaloader()
 
         try:
-            if os.path.exists(session_file):
-                print(f"[Session] Trying saved session for {username}")
-                L.load_session_from_file(username, filename=session_file)
+            if os.path.exists(session_path):
+                print(f"[Session] Loading saved session for {username}")
+                L.load_session_from_file(username, session_path)
                 instaloader.Profile.from_username(L.context, username)
-                print(f"[Login Success] Session valid for {username}")
+                print(f"[Login Success] Using session for {username}")
                 return L
             else:
-                print(f"[Login Attempt] Logging in with {username}")
-                L.login(username, password)
-                L.save_session_to_file(filename=session_file)
-                print(f"[Login Success] Logged in and saved session for {username}")
-                return L
-        except (ProfileNotExistsException, BadResponseException) as e:
-            print(f"[Login Failed] {username}: {e}")
+                print(f"[Session Missing] No session file for {username}")
         except Exception as e:
             print(f"[Login Failed] {username}: {e}")
 
-    print("[Login Error] All accounts failed")
+    print("[Login Error] All session attempts failed.")
     return None
 
 def get_instaloader_data(username):
